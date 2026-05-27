@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía: Relevamiento SCADA y SE · 6° Año</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080a08;--bg2:#0d110c;--bg3:#111a10;--bg4:#162015;
+  --am:#f59e0b;--am2:#d97706;--am3:#92400e;
+  --gr:#22c55e;--bl:#3b82f6;--re:#ef4444;--cy:#06b6d4;
+  --txt:#e8f0e0;--muted:#6b8a5e;--dim:#1e2e1a;--border:#243320;
+  --mono:'Share Tech Mono',monospace;--sans:'Exo 2',sans-serif;--title:'Rajdhani',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--bg);color:var(--txt);font-size:16px;line-height:1.7;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:1000;}
+
+header{padding:0;border-bottom:2px solid var(--am3);background:linear-gradient(180deg,#0a1209 0%,var(--bg) 100%);}
+.hdr-grid{display:grid;grid-template-columns:1fr auto;align-items:center;max-width:1000px;margin:0 auto;padding:48px 24px 36px;gap:24px;}
+.hdr-label{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--am);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.hdr-label::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--am);box-shadow:0 0 8px var(--am);animation:blink 2s ease infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-family:var(--title);font-size:clamp(28px,5vw,48px);font-weight:700;line-height:1;color:#fff;letter-spacing:1px;}
+h1 span{color:var(--am);}
+.hdr-sub{color:var(--muted);font-size:14px;margin-top:10px;max-width:500px;}
+.hdr-panel{background:var(--bg4);border:1px solid var(--am3);border-radius:8px;padding:14px 18px;font-family:var(--mono);font-size:11px;min-width:160px;text-align:center;}
+.hdr-panel-val{font-size:24px;font-weight:700;color:var(--am);display:block;line-height:1;margin-bottom:4px;}
+
+main{max-width:1000px;margin:0 auto;padding:40px 24px 80px;}
+section{margin-bottom:60px;}
+
+.sec-num{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--am);text-transform:uppercase;margin-bottom:8px;}
+.sec-h2{font-family:var(--title);font-size:clamp(20px,3vw,28px);font-weight:700;color:#fff;margin-bottom:6px;}
+.sec-sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:600px;}
+.divider{height:1px;background:linear-gradient(90deg,var(--am3),transparent);margin-bottom:20px;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;transition:border-color .2s;}
+.card:hover{border-color:var(--am);}
+.card h3{font-family:var(--title);font-size:16px;font-weight:600;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.card p{font-size:13px;color:var(--txt);margin:8px 0;line-height:1.8;}
+.card li{font-size:13px;color:var(--txt);margin:6px 0;}
+
+.box{border-left:4px solid var(--am);background:rgba(245,158,11,.06);border-radius:8px;padding:12px 14px;margin:12px 0;font-size:13px;}
+.box strong{color:var(--am);}
+
+.tabla{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px;}
+.tabla th{background:var(--bg4);color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.tabla td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);}
+.tabla tr:hover td{background:rgba(245,158,11,.03);}
+
+.chip{display:inline-block;padding:2px 8px;border-radius:10px;font-family:var(--mono);font-size:10px;font-weight:600;margin-right:6px;margin-bottom:4px;}
+.chip-am{background:rgba(245,158,11,.15);color:var(--am);}
+.chip-gr{background:rgba(34,197,94,.15);color:var(--gr);}
+
+.code{background:rgba(0,0,0,.7);border-left:3px solid var(--am3);border-radius:6px;padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--am);margin:10px 0;overflow-x:auto;}
+
+.paso{background:var(--bg4);border-left:4px solid var(--am);border-radius:8px;padding:12px;margin:10px 0;}
+.paso strong{color:var(--am);}
+
+.diag{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin:12px 0;overflow-x:auto;}
+.diag-flow{display:flex;align-items:center;gap:0;justify-content:center;flex-wrap:wrap;}
+.diag-node{background:var(--bg4);border:1px solid var(--am3);border-radius:6px;padding:8px 12px;text-align:center;min-width:90px;font-family:var(--mono);font-size:10px;}
+.diag-node-ico{font-size:18px;display:block;margin-bottom:4px;}
+.diag-node-lbl{color:var(--am);font-weight:700;}
+.diag-node-sub{color:var(--muted);font-size:9px;}
+.diag-arrow{color:var(--am3);padding:0 6px;font-size:16px;}
+
+.rubrica{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin:10px 0;}
+.rubrica h4{color:var(--am);margin-bottom:8px;font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+.rubrica-item{display:grid;grid-template-columns:120px 1fr;gap:12px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.05);}
+.rubrica-item:last-child{border-bottom:none;}
+.rubrica-label{color:var(--muted);font-weight:600;font-size:12px;}
+.rubrica-desc{color:var(--txt);font-size:12px;}
+
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;}
+footer span{color:var(--am);}
+
+@media (max-width:768px){h1{font-size:22px}.card{padding:12px}.tabla{font-size:11px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-grid">
+    <div>
+      <div class="hdr-label">6° SCADA y SE · Actividad Individual</div>
+      <h1>Relevamiento<br><span>SCADA y SE</span></h1>
+      <p class="hdr-sub">Documenta tu maqueta domótica aplicando los conceptos del 1° trimestre. Trabajo en Word, entrega por Discord.</p>
+    </div>
+    <div>
+      <div class="hdr-panel">
+        <span class="hdr-panel-val">2 hs</span>
+        <span>Duración</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ════════════════════════════════════════════
+     RESUMEN EJECUTIVO
+════════════════════════════════════════════ -->
+
+<section id="resumen">
+  <div class="sec-num">// Resumen</div>
+  <h2 class="sec-h2">¿Qué tenés que hacer?</h2>
+  <p class="sec-sub">Documentá tu maqueta en Word.</p>
+  <div class="divider"></div>
+
+  <div class="card">
+    <h3>📋 La tarea en 3 puntos</h3>
+    <p><strong>Hora 1:</strong> Relevamiento físico — registrá cada componente de la maqueta con sus especificaciones técnicas.</p>
+    <p><strong>Hora 2:</strong> Documentación — completá el template Word aplicando los conceptos que estudiaste.</p>
+    <p><strong>Entrega:</strong> Archivo .docx por Discord, nombre: <code style="color:var(--am);">DOMOTICA_NombreApellido_2026.docx</code></p>
+  </div>
+
+  <div class="box">
+    <strong>✓ Este documento será presentado a COTECAL.</strong> Debe ser profesional, detallado y claro.
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     QUÉ DOCUMENTAR
+════════════════════════════════════════════ -->
+
+<section id="quehacer">
+  <div class="sec-num">// Contenidos</div>
+  <h2 class="sec-h2">Qué documentar (aplicando los temas de clase)</h2>
+  <p class="sec-sub">Todo esto entra en el template Word.</p>
+  <div class="divider"></div>
+
+  <!-- Sección 1 -->
+  <div class="card">
+    <h3>1️⃣ Arquitectura SCADA</h3>
+    <p>Recordá: tu maqueta tiene 4 capas (vieron en clase):</p>
+    <div class="diag">
+      <div class="diag-flow">
+        <div class="diag-node"><div class="diag-node-ico">🌡️</div><div class="diag-node-lbl">Sensores</div><div class="diag-node-sub">Lectura</div></div>
+        <div class="diag-arrow">→</div>
+        <div class="diag-node"><div class="diag-node-ico">🖥️</div><div class="diag-node-lbl">Controlador</div><div class="diag-node-sub">Lógica</div></div>
+        <div class="diag-arrow">→</div>
+        <div class="diag-node"><div class="diag-node-ico">📡</div><div class="diag-node-lbl">Comunicación</div><div class="diag-node-sub">Conexión</div></div>
+        <div class="diag-arrow">→</div>
+        <div class="diag-node"><div class="diag-node-ico">📊</div><div class="diag-node-lbl">HMI-SCADA</div><div class="diag-node-sub">Dashboard</div></div>
+      </div>
+    </div>
+    <p><strong>En tu documento:</strong> Explicá cómo funciona cada capa en tu sistema. Dibujá un diagrama.</p>
+  </div>
+
+  <!-- Sección 2 -->
+  <div class="card">
+    <h3>2️⃣ IT vs OT — Identificá tu red</h3>
+    <p>Tu maqueta es una red <span class="chip chip-am">OT (operaciones industriales)</span>, no IT. ¿Por qué?</p>
+    <table class="tabla">
+      <thead><tr><th>Red IT (Oficina)</th><th>Red OT (Tu sistema)</th></tr></thead>
+      <tbody>
+        <tr><td>Prioridad: confidencialidad</td><td>Prioridad: disponibilidad 24/7</td></tr>
+        <tr><td>Demora: aceptable (segundos)</td><td>Demora: crítica (milisegundos)</td></tr>
+        <tr><td>Protocolos: HTTP, FTP, SMTP</td><td>Protocolos: Modbus, MQTT</td></tr>
+      </tbody>
+    </table>
+    <p><strong>En tu documento:</strong> Explicá brevemente por qué tu sistema es OT.</p>
+  </div>
+
+  <!-- Sección 3 -->
+  <div class="card">
+    <h3>3️⃣ Protocolo de Comunicación</h3>
+    <p>¿Usa <span class="chip chip-gr">Modbus</span> o <span class="chip chip-gr">MQTT</span>? Documentá:</p>
+    
+    <div class="paso">
+      <strong>Si usa Modbus:</strong>
+      <ul style="margin-left:20px;margin-top:8px;font-size:13px;">
+        <li>Tipo: RTU (serial RS-485) o TCP (Ethernet)</li>
+        <li>¿Quién es el maestro? (Arduino, ESP32, PC)</li>
+        <li>¿Quiénes son los esclavos? (sensores, actuadores)</li>
+        <li>Velocidad: baudrate (9600, 19200, etc) o IP:puerto</li>
+      </ul>
+    </div>
+
+    <div class="paso">
+      <strong>Si usa MQTT:</strong>
+      <ul style="margin-left:20px;margin-top:8px;font-size:13px;">
+        <li>Broker: IP y puerto (ej: 192.168.1.100:1883)</li>
+        <li>¿Quién publica? (publisher)</li>
+        <li>¿Quién se suscribe? (subscriber)</li>
+        <li>Topics usados: listá todos (ej: represa/nivel, represa/alertas)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sección 4 -->
+  <div class="card">
+    <h3>4️⃣ Componentes Documentados</h3>
+    <p>Listá TODOS con especificaciones técnicas:</p>
+    <table class="tabla">
+      <thead><tr><th>Categoría</th><th>Qué incluir</th><th>Ejemplo</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Sensores</strong></td><td>Modelo, cantidad, especificaciones, pin, estado</td><td>DHT22 en GPIO4, rango -40 a 80°C</td></tr>
+        <tr><td><strong>Actuadores</strong></td><td>Tipo, modelo, cantidad, voltaje, pin, estado</td><td>Relé 5V 10A en GPIO12</td></tr>
+        <tr><td><strong>Controlador</strong></td><td>Modelo, especificaciones, firmware</td><td>Arduino Uno, 16MHz, 2KB RAM</td></tr>
+        <tr><td><strong>Comunicación</strong></td><td>Módulo, protocolo, configuración</td><td>ESP32 WiFi, MQTT, IP 192.168.1.5</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Sección 5 -->
+  <div class="card">
+    <h3>5️⃣ Diagrama Técnico (Lo más importante)</h3>
+    <p>Dibujá cómo se conectan TODOS los componentes. Debe ser legible y profesional.</p>
+    <p><strong>Puede ser:</strong> A mano escaneado, en Lucidchart, LibreOffice Draw, o cualquier herramienta.</p>
+    <p><strong>Debe incluir:</strong></p>
+    <ul style="margin-left:20px;margin-top:8px;font-size:13px;">
+      <li>Sensores → Controlador (voltajes, pines)</li>
+      <li>Actuadores ← Controlador (control, voltajes)</li>
+      <li>Protocolo de comunicación (Modbus/MQTT)</li>
+      <li>HMI / Dashboard</li>
+    </ul>
+  </div>
+
+  <!-- Sección 6 -->
+  <div class="card">
+    <h3>6️⃣ Modelo OSI (Referencia rápida)</h3>
+    <p>Identificá qué capas usa tu sistema:</p>
+    <table class="tabla">
+      <thead><tr><th>#</th><th>Capa</th><th>Tu sistema</th></tr></thead>
+      <tbody>
+        <tr><td>7</td><td>Aplicación</td><td>Modbus / MQTT</td></tr>
+        <tr><td>4</td><td>Transporte</td><td>TCP (confiable)</td></tr>
+        <tr><td>3</td><td>Red</td><td>IP (192.168.x.x)</td></tr>
+        <tr><td>1–2</td><td>Física/Enlace</td><td>Ethernet o WiFi</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     CÓMO USAR EL TEMPLATE
+════════════════════════════════════════════ -->
+
+<section id="template">
+  <div class="sec-num">// Herramienta</div>
+  <h2 class="sec-h2">Cómo usar el template Word</h2>
+  <p class="sec-sub">El archivo ya tiene toda la estructura lista. Solo completás cada sección.</p>
+  <div class="divider"></div>
+
+  <div class="paso">
+    <strong>1. Descargá el template</strong><br>
+    Archivo: <code style="color:var(--am);">SCADA_Relevamiento_Template.docx</code><br>
+    Lo compartimos por Discord en <code style="color:var(--am);">#SCADA-6to</code>
+  </div>
+
+  <div class="paso">
+    <strong>2. Datos del alumno</strong><br>
+    Completá: nombre, fecha, proyecto (Maqueta Domótica para COTECAL)
+  </div>
+
+  <div class="paso">
+    <strong>3. Descripción general</strong><br>
+    Breve explicación de qué es tu maqueta (4–5 líneas)
+  </div>
+
+  <div class="paso">
+    <strong>4. Arquitectura SCADA</strong><br>
+    Identifica las 4 capas. ¿Es IT u OT? Justificá.
+  </div>
+
+  <div class="paso">
+    <strong>5. Tablas de componentes</strong><br>
+    Completá las tablas de sensores, actuadores y controlador. No dejes nada vacío.
+  </div>
+
+  <div class="paso">
+    <strong>6. Protocolo de comunicación</strong><br>
+    Selecciona Modbus o MQTT. Detalles específicos de tu sistema.
+  </div>
+
+  <div class="paso">
+    <strong>7. Diagrama</strong><br>
+    Insertá imagen escaneada o archivo (.png, .jpg). Si es a mano, asegurate que sea LEGIBLE.
+  </div>
+
+  <div class="paso">
+    <strong>8. Conclusión</strong><br>
+    5–6 líneas resumiendo cómo funciona todo. ¿Qué problemas tuviste?
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     RÚBRICA
+════════════════════════════════════════════ -->
+
+<section id="rubrica">
+  <div class="sec-num">// Evaluación</div>
+  <h2 class="sec-h2">Cómo será calificado</h2>
+  <p class="sec-sub">Nota mínima para pasar: 7/10</p>
+  <div class="divider"></div>
+
+  <div class="rubrica">
+    <h4>📋 Completitud del Relevamiento (30%)</h4>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Componentes</div>
+      <div class="rubrica-desc">TODOS documentados: sensores, actuadores, controlador, comunicación.</div>
+    </div>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Especificaciones</div>
+      <div class="rubrica-desc">Modelo, voltaje, pin, estado de cada componente. Nada vacío.</div>
+    </div>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Rol SCADA</div>
+      <div class="rubrica-desc">Se identifica: sensor = lectura, actuador = control, etc.</div>
+    </div>
+  </div>
+
+  <div class="rubrica">
+    <h4>🏗️ Arquitectura y Diagrama (30%)</h4>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Diagrama claro</div>
+      <div class="rubrica-desc">Sensores → Controlador → Comunicación → HMI/SCADA. Legible.</div>
+    </div>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Etiquetado</div>
+      <div class="rubrica-desc">Voltajes, pines, protocolos visibles. Profesional.</div>
+    </div>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Protocolo explicado</div>
+      <div class="rubrica-desc">Claro cuál protocolo (Modbus/MQTT) y cómo funciona.</div>
+    </div>
+  </div>
+
+  <div class="rubrica">
+    <h4>💡 Conceptos de Clase (25%)</h4>
+    <div class="rubrica-item">
+      <div class="rubrica-label">IT vs OT</div>
+      <div class="rubrica-desc">Se menciona que es OT y se justifica por qué.</div>
+    </div>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Modelo maestro/esclavo o pub/sub</div>
+      <div class="rubrica-desc">Se entiende la comunicación (Modbus o MQTT).</div>
+    </div>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Modelo OSI</div>
+      <div class="rubrica-desc">Se identifican capas usadas (aplicación, transporte, red).</div>
+    </div>
+  </div>
+
+  <div class="rubrica">
+    <h4>📄 Presentación (15%)</h4>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Formato</div>
+      <div class="rubrica-desc">Bien formateado, portada, márgenes, numeración.</div>
+    </div>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Redacción</div>
+      <div class="rubrica-desc">Sin faltas. Lenguaje técnico correcto.</div>
+    </div>
+    <div class="rubrica-item">
+      <div class="rubrica-label">Profesionalismo</div>
+      <div class="rubrica-desc">Listo para presentar a COTECAL.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     ENTREGA
+════════════════════════════════════════════ -->
+
+<section id="entrega">
+  <div class="sec-num">// Entrega</div>
+  <h2 class="sec-h2">Plazo y formato</h2>
+  <p class="sec-sub">Discord, sin prórroga.</p>
+  <div class="divider"></div>
+
+  <div class="card">
+    <h3>📤 Cómo entregar</h3>
+    <p><strong>Canal:</strong> #proyecto-domotica</p>
+    <p><strong>Archivo:</strong> <code style="color:var(--am);">SCADA_NombreApellido_2026.docx</code> (Word, no PDF)</p>
+    <p><strong>Mensaje:</strong> Incluí una breve descripción del sistema (3–4 líneas)</p>
+  </div>
+
+  <div class="card">
+    <h3>📅 Plazo</h3>
+    <p>Miércoles 3 de junio.</p>
+    <div class="box">
+      <strong>Sin prórroga.</strong> Trabajos después del plazo: -2 puntos automático.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>❓ Preguntas frecuentes</h3>
+    <p><strong>¿Es trabajo en grupo?</strong> No. Individual. Cada alumno con sus datos.</p>
+    <p><strong>¿Puedo hacer el diagrama a mano?</strong> Sí, si está bien escaneado y es LEGIBLE.</p>
+    <p><strong>¿Incluyo código?</strong> No. Este es un documento de arquitectura, no de código.</p>
+    <p><strong>¿Si nos faltan componentes?</strong> Documenten lo que tienen. Marquen pendientes. La evaluación no baja por componentes faltantes sino por mala documentación.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+Sistemas SCADA · 6° 1° ACPI · <span>Escuela Industrial N°9 · El Calafate · Prof. Pablo Limardo · 2026</span>
+</footer>
+
+</body>
+</html>
